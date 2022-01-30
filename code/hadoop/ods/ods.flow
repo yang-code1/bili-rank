@@ -1,0 +1,33 @@
+# filename: ods.flow
+
+config:
+ script_path_prefix: /opt/scripts
+nodes:
+ - name: START
+   type: noop
+
+ - name: DATA_COLLECT
+   type: command
+   dependsOn:
+     - START
+   config:
+     command: sh "${script_path_prefix}"/spider.sh
+
+ - name: FLUME_COLLECT
+   type: command
+   dependsOn:
+     - START
+   config:
+     command: sh "${script_path_prefix}"/start-flume.sh
+
+ - name: SQOOP_MYSQL
+   type: command
+   dependsOn:
+     - DATA_COLLECT
+     - FLUME_COLLECT
+   config:
+     command: sh "${script_path_prefix}"/sqoop_mysql.sh
+ - name: END
+   type: noop
+   dependsOn:                                                                         
+     - SQOOP_MYSQL
